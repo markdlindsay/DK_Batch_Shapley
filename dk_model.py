@@ -45,7 +45,6 @@ class DeepKrigingTrainer:
         torch.manual_seed(42)
         np.random.seed(42)
 
-
     def train_model(self, model, optimizer, criterion):
         self.train_losses = []  
         self.test_losses = []   
