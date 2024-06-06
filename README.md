@@ -1,8 +1,11 @@
 # Interpreting Deepkriging for Spatial Interpolation in Geostatistics
 
 ## Overview
+*Written by Fabian Leal-Villaseca, Edward Cripps, Mark Jessell, and Mark Lindsay.*
 
-This repository contains the code and data associated with the paper "Interpreting Deepkriging for Spatial Interpolation in Geostatistics" by Fabian Leal-Villaseca, Edward Cripps, Mark Jessell, and Mark Lindsay. The paper produces an interpretation method for Deepkriging—a deep learning model tailored for geostatistical interpolation problems. The study demonstrates the feasibility of interpreting Deepkriging results using an adaptation of a well established feature attribution method, addressing key challenges of deep neural networks in capturing spatial dependencies and model interpretability.
+This repository contains the code and data associated with the paper "Interpreting Deepkriging for Spatial Interpolation in Geostatistics" 
+
+The paper produces an interpretation method for Deepkriging—a deep learning model tailored for geostatistical interpolation problems. The study demonstrates the feasibility of interpreting Deepkriging results using an adaptation of a well established feature attribution method, addressing key challenges of deep neural networks in capturing spatial dependencies and model interpretability.
 
 ## Repository Structure
 
