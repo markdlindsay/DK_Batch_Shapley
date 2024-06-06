@@ -20,6 +20,10 @@ This repository contains the code and data associated with the paper "Interpreti
 
 ## Key Features
 
-- **Deepkriging**: A deep neural network architecture designed for spatial interpolation in geostatistics. This model expands the spatial coordinate feature space using basis functions, enabling the network to learn spatial dependencies effectively. It was developed by Chen et al., 2020. See https://arxiv.org/abs/2007.11972.
+- **Deepkriging**: A deep neural network architecture designed for spatial interpolation in geostatistics. This model expands the spatial coordinate feature space using basis functions, enabling the network to learn spatial dependencies effectively. It was developed by Chen et al. (2020). See https://arxiv.org/abs/2007.11972.
 - **Batched Shapley**: An adaptation of Shapley values, a game-theoretic approach used for feature importance, that we developed specifically for interpreting Deepkriging. This method provides insights into the importance of features for each prediction made by a predictive model. In this case, these are density spatial interpolation predictions.
 - **Benchmarking**: Comparison of Deepkriging with traditional kriging methods, demonstrating superior performance in both purely spatial cases and scenarios involving additional variables.
+
+## References
+- Chen, W., Li, Y., Reich, B.J., Sun, Y., 2020. Deepkriging: Spatially dependent deep neural networks for spatial prediction. arXiv preprint461
+arXiv:2007.11972 .
