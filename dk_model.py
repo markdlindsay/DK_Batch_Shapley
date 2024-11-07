@@ -42,14 +42,18 @@ class DeepKrigingTrainer:
         self.test_mse_list = []
         self.test_mae_list = []
         self.test_adjusted_r2_list = []
+        self.test_r2_list = []
         torch.manual_seed(42)
         np.random.seed(42)
+
 
     def train_model(self, model, optimizer, criterion):
         self.train_losses = []  
         self.test_losses = []   
         # Training loop
-        for step in range(601):
+        #for step in range(2001): #For Shapley
+        for step in range(4601):
+            model.train()
             pre = model(self.x_train)
             mse = criterion(pre, self.y_train)
             cost = mse
@@ -58,22 +62,71 @@ class DeepKrigingTrainer:
             cost.backward()
             optimizer.step()
 
-            pre_test = model(self.x_test)
-            mse_test = criterion(pre_test, self.y_test)
-            self.test_losses.append(mse_test.item())
-
             self.train_losses.append(mse.item())
 
-        if self.plot_errors:
-            plt.figure(figsize=(10, 5))
-            plt.plot(self.train_losses, label='Train MSE')
-            plt.plot(self.test_losses, label='Test MSE')
-            plt.xlabel('Epoch')
-            plt.ylabel('MSE')
-            plt.title('Training and Test MSE Convergence')
-            plt.legend()
-            plt.grid(True)
-            plt.show()
+        #     pre_test = model(self.x_test)
+        #     mse_test = criterion(pre_test, self.y_test)
+        #     self.test_losses.append(mse_test.item())
+
+
+        # if self.plot_errors:
+        #     plt.figure(figsize=(10, 5))
+        #     plt.plot(self.train_losses[150:], label='Train MSE')
+        #     plt.plot(self.test_losses[150:], label='Test MSE')
+        #     plt.xlabel('Epoch')
+        #     plt.ylabel('MSE')
+        #     plt.title('Training and Test MSE Convergence')
+        #     plt.legend()
+        #     plt.grid(True)
+        #     plt.show()
+        
+    def fit(self, train_data, test_data=None):
+        if self.covariates is not None:
+            self.x_train = torch.tensor(train_data[self.phi_columns + self.covariates].values, dtype=torch.float32)
+            if test_data is not None:
+                self.x_test = torch.tensor(test_data[self.phi_columns + self.covariates].values, dtype=torch.float32)
+        else:
+            self.x_train = torch.tensor(train_data[self.phi_columns].values, dtype=torch.float32)
+            if test_data is not None:
+                self.x_test = torch.tensor(test_data[self.phi_columns].values, dtype=torch.float32)
+
+        self.y_train = torch.tensor(train_data['Density_gcm3'].values.reshape(-1, 1), dtype=torch.float32)
+        if test_data is not None:
+            self.y_test = torch.tensor(test_data['Density_gcm3'].values.reshape(-1, 1), dtype=torch.float32)
+
+        self.model2 = DeepKriging(self.p)
+        criterion = nn.MSELoss()
+        if self.p > 10:
+#           rate = 0.001
+            rate = 0.001
+        else:
+#           rate = 0.001
+            rate = 0.001
+        optimizer = optim.Adam(self.model2.parameters(), lr=rate)
+        self.train_losses = []
+        if test_data is not None:
+            self.train_model(self.model2, optimizer, criterion)
+        else:
+            for epoch in range(601):
+                pre = self.model2(self.x_train)
+                mse = criterion(pre, self.y_train)
+                cost = mse
+                
+                optimizer.zero_grad()
+                cost.backward()
+                optimizer.step()
+
+                self.train_losses.append(mse.item())
+
+    def predict(self, data):
+        if self.covariates is not None:
+            x = torch.tensor(data[self.phi_columns + self.covariates].values, dtype=torch.float32)
+        else:
+            x = torch.tensor(data[self.phi_columns].values, dtype=torch.float32)
+        self.model2.eval()
+        with torch.no_grad():
+            predictions = self.model2(x).detach().numpy().flatten()
+        return predictions
 
     def train_neural_network(self, mode="cross", test_size=None):
         if mode == "cross":
@@ -97,13 +150,14 @@ class DeepKrigingTrainer:
 
                 self.model2 = DeepKriging(self.p)
                 criterion = nn.MSELoss()
-                optimizer = optim.Adam(self.model2.parameters(), lr=0.005)
+                optimizer = optim.Adam(self.model2.parameters(), lr = 0.005)
 
                 self.train_model(self.model2, optimizer, criterion)
-                self.test_predictions_fold = self.model2(self.x_test).detach().numpy().flatten()
-
-                    # Store metrics for this fold
-                self.test_predictions_fold = self.model2(self.x_test).detach().numpy().flatten()
+                # Store metrics for this fold
+                self.model2.eval()
+                with torch.no_grad():
+                    self.test_predictions_fold = self.model2(self.x_test).detach().numpy().flatten()
+        
                 self.test_mse_list.append(mean_squared_error(self.y_test, self.test_predictions_fold))
                 self.test_mae_list.append(mean_absolute_error(self.y_test, self.test_predictions_fold))
 
@@ -116,12 +170,14 @@ class DeepKrigingTrainer:
                 r2 = 1 - (ssr / sst)
                 adjusted_r2 = 1 - ((1 - r2) * (n - 1) / (n - self.p - 1))
                 self.test_adjusted_r2_list.append(adjusted_r2)
-
+                self.test_r2_list.append(r2)
             # Calculate and print average metrics across folds
             print("\nAverage Metrics Across Folds:")
             print(f"  Average MSE: {np.mean(self.test_mse_list):.4f}")
             print(f"  Average MAE: {np.mean(self.test_mae_list):.4f}")
             print(f"  Average Adjusted R2: {np.mean(self.test_adjusted_r2_list):.4f}")
+            print(f"  Average R2: {np.mean(self.test_r2_list):.4f}")
+
 
         elif mode == "regular":
             if test_size is None:
@@ -144,10 +200,14 @@ class DeepKrigingTrainer:
 
             self.model2 = DeepKriging(self.p)
             criterion = nn.MSELoss()
-            optimizer = optim.Adam(self.model2.parameters(), lr=0.005)
+            optimizer = optim.Adam(self.model2.parameters(), lr = 0.005)
 
             self.train_model(self.model2, optimizer, criterion)
-            self.test_predictions = self.model2(self.x_test).detach().numpy().flatten()
+
+            self.model2.eval()
+            with torch.no_grad():
+                self.test_predictions = self.model2(self.x_test).detach().numpy().flatten()
+    
             self.print_metrics(self.y_test, self.test_predictions, "Deposit Data")
 
     def print_metrics(self, true_values, predicted_values, dataset_name):
