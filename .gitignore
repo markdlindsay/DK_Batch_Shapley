@@ -1,0 +1,8 @@
+# Ignore node modules folder
+Data_Parker/
+
+# Ignore all log files
+*.csv
+
+# Ignore specific file
+#secret_config.txt
