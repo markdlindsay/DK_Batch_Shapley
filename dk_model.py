@@ -7,6 +7,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+#response_var = 'Density_gcm3'
+response_var = 'Au_ppm'
+
 class DeepKriging(nn.Module):
     def __init__(self, input_size):
         super(DeepKriging, self).__init__()
@@ -90,9 +93,9 @@ class DeepKrigingTrainer:
             if test_data is not None:
                 self.x_test = torch.tensor(test_data[self.phi_columns].values, dtype=torch.float32)
 
-        self.y_train = torch.tensor(train_data['Density_gcm3'].values.reshape(-1, 1), dtype=torch.float32)
+        self.y_train = torch.tensor(train_data[response_var].values.reshape(-1, 1), dtype=torch.float32)
         if test_data is not None:
-            self.y_test = torch.tensor(test_data['Density_gcm3'].values.reshape(-1, 1), dtype=torch.float32)
+            self.y_test = torch.tensor(test_data[response_var].values.reshape(-1, 1), dtype=torch.float32)
 
         self.model2 = DeepKriging(self.p)
         criterion = nn.MSELoss()
@@ -145,8 +148,8 @@ class DeepKrigingTrainer:
                     self.x_train = torch.tensor(self.train_data[self.phi_columns].values, dtype=torch.float32)
                     self.x_test = torch.tensor(self.test_data[self.phi_columns].values, dtype=torch.float32)
 
-                self.y_train = torch.tensor(self.train_data['Density_gcm3'].values.reshape(-1, 1), dtype=torch.float32)
-                self.y_test = torch.tensor(self.test_data['Density_gcm3'].values.reshape(-1, 1), dtype=torch.float32)
+                self.y_train = torch.tensor(self.train_data[response_var].values.reshape(-1, 1), dtype=torch.float32)
+                self.y_test = torch.tensor(self.test_data[response_var].values.reshape(-1, 1), dtype=torch.float32)
 
                 self.model2 = DeepKriging(self.p)
                 criterion = nn.MSELoss()
@@ -161,7 +164,7 @@ class DeepKrigingTrainer:
                 self.test_mse_list.append(mean_squared_error(self.y_test, self.test_predictions_fold))
                 self.test_mae_list.append(mean_absolute_error(self.y_test, self.test_predictions_fold))
 
-                y_test_compat = self.test_data['Density_gcm3'].values
+                y_test_compat = self.test_data[response_var].values
 
                 n = len(y_test_compat)
                 mean_y_test = np.mean(y_test_compat)
@@ -192,8 +195,8 @@ class DeepKrigingTrainer:
                 self.x_train = torch.tensor(self.train_data[self.phi_columns].values, dtype=torch.float32)
                 self.x_test = torch.tensor(self.test_data[self.phi_columns].values, dtype=torch.float32)
 
-            self.y_train = torch.tensor(self.train_data['Density_gcm3'].values.reshape(-1, 1), dtype=torch.float32)
-            self.y_test = torch.tensor(self.test_data['Density_gcm3'].values.reshape(-1, 1), dtype=torch.float32)
+            self.y_train = torch.tensor(self.train_data[response_var].values.reshape(-1, 1), dtype=torch.float32)
+            self.y_test = torch.tensor(self.test_data[response_var].values.reshape(-1, 1), dtype=torch.float32)
 
             self.x_train_df = pd.DataFrame(self.x_train.numpy(), columns=self.phi_columns + self.covariates if self.covariates else self.phi_columns)
             self.x_test_df = pd.DataFrame(self.x_test.numpy(), columns=self.phi_columns + self.covariates if self.covariates else self.phi_columns)
