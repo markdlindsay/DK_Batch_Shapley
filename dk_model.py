@@ -34,7 +34,8 @@ class DeepKrigingTrainer:
     def __init__(self, deposit_data, covariates=None, regular_nn=False, plot_errors=True):
         self.deposit_data = deposit_data
         self.covariates = covariates
-        self.phi_columns = self.deposit_data.columns[10:].tolist()
+        #self.phi_columns = self.deposit_data.columns[10:].tolist()
+        self.phi_columns = self.deposit_data.columns[6:].tolist()
         if regular_nn:
             self.phi_columns = ['X', 'Y', 'Z']
         if self.covariates is not None:
