@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 
 #response_var = 'Density_gcm3'
 response_var = 'Au_ppm'
+df_length = 12
 
 class DeepKriging(nn.Module):
     def __init__(self, input_size):
@@ -35,7 +36,7 @@ class DeepKrigingTrainer:
         self.deposit_data = deposit_data
         self.covariates = covariates
         #self.phi_columns = self.deposit_data.columns[10:].tolist()
-        self.phi_columns = self.deposit_data.columns[6:].tolist()
+        self.phi_columns = self.deposit_data.columns[df_length:].tolist()
         if regular_nn:
             self.phi_columns = ['X', 'Y', 'Z']
         if self.covariates is not None:
