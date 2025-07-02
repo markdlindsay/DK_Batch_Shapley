@@ -6,10 +6,40 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import yaml
+
+'''
+#load model parameters from yaml file
+with open('Gonneville_pars.yaml', 'r') as file:
+    model_params = yaml.safe_load(file)
+
+#Access parameters
+mineral = model_params['response']
+#mineral = tuple(mineral)  # Convert to tuple for consistency
+covariates = model_params['covariates']
+#covariates = tuple(covariates)  # Convert to tuple for consistency
+
+#model_params = model_params['model']
+
+learning_rate = model_params['learning_rate']
+batch_size = model_params['batch_size']
+epochs = model_params['epochs']
+cellsize = model_params['cellsize']
+layers = model_params['layers']
+dropout = model_params['dropout']
+activation = model_params['activation']
+loss = model_params['loss']
+optimizer = model_params['optimizer']
+
+X = model_params['x']
+Y = model_params['y']
+Z = model_params['z']
+
 
 #response_var = 'Density_gcm3'
-response_var = 'Au_ppm'
-df_length = 12
+response_var = mineral
+#df_length = 12
+'''
 
 class DeepKriging(nn.Module):
     def __init__(self, input_size):
@@ -32,13 +62,14 @@ class DeepKriging(nn.Module):
         return self.model(x)
 
 class DeepKrigingTrainer:
-    def __init__(self, deposit_data, covariates=None, regular_nn=False, plot_errors=True):
+    def __init__(self, deposit_data, covariates=None, regular_nn=False, plot_errors=True, phi_columns=None):
         self.deposit_data = deposit_data
         self.covariates = covariates
+        self.phi_columns = phi_columns # list of which columns to use as basis functions
         #self.phi_columns = self.deposit_data.columns[10:].tolist()
-        self.phi_columns = self.deposit_data.columns[df_length:].tolist()
+        #self.phi_columns = self.phi_columns.tolist()
         if regular_nn:
-            self.phi_columns = ['X', 'Y', 'Z']
+            self.phi_columns = ['mid_x_y', 'mid_y_y', 'mid_z_y']
         if self.covariates is not None:
             self.p = len(self.covariates) + len(self.phi_columns)
         else:
