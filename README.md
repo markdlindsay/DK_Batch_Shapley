@@ -8,6 +8,12 @@ This repository contains the code and data associated with the paper "[Interpret
 
 The paper produces an interpretation method for Deepkriging—a deep learning model tailored for geostatistical interpolation problems. The study demonstrates the feasibility of interpreting Deepkriging results using an adaptation of a well established feature attribution method, addressing key challenges of deep neural networks in capturing spatial dependencies and model interpretability.
 
+*Update December 2025*
+
+The original repository had notebooks defining a custom model for demonstration. A generic model can now be run using five notebooks starting with number and underscore '1_..., 2_....' etc. These notebooks using parameters defined in the 'model_pars.yaml' file.
+The fifth notebook needs work...
+
+
 ## Repository Structure
 
 - **Data**: Directory containing the datasets used in the study.
