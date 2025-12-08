@@ -10,7 +10,7 @@ The paper produces an interpretation method for Deepkriging—a deep learning mo
 
 *Update December 2025*
 
-The original repository had notebooks defining a custom model for demonstration. A generic model can now be run using five notebooks starting with number and underscore '1_..., 2_....' etc. These notebooks using parameters defined in the 'model_pars.yaml' file.
+The original repository had notebooks defining a custom model for demonstration. A generic model can now be run using five notebooks starting with number and underscore '1_..., 2_....' etc. These notebooks use parameters defined in the 'model_pars.yaml' file.
 The fifth notebook needs work...
 
 
