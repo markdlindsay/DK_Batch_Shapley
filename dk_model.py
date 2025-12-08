@@ -8,7 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import yaml
 
-'''
+
 #load model parameters from yaml file
 with open('Gonneville_pars.yaml', 'r') as file:
     model_params = yaml.safe_load(file)
@@ -18,7 +18,7 @@ mineral = model_params['response']
 #mineral = tuple(mineral)  # Convert to tuple for consistency
 covariates = model_params['covariates']
 #covariates = tuple(covariates)  # Convert to tuple for consistency
-
+'''
 #model_params = model_params['model']
 
 learning_rate = model_params['learning_rate']
@@ -62,14 +62,15 @@ class DeepKriging(nn.Module):
         return self.model(x)
 
 class DeepKrigingTrainer:
-    def __init__(self, deposit_data, covariates=None, regular_nn=False, plot_errors=True, phi_columns=None):
+    def __init__(self, deposit_data, covariates=None, spatial_coords= None, regular_nn=False, plot_errors=True, phi_columns=None):
         self.deposit_data = deposit_data
         self.covariates = covariates
-        self.phi_columns = phi_columns # list of which columns to use as basis functions
-        #self.phi_columns = self.deposit_data.columns[10:].tolist()
+        #self.phi_columns = phi_columns # list of which columns to use as basis functions
+        self.phi_columns = self.deposit_data.columns[phi_columns:].tolist()
         #self.phi_columns = self.phi_columns.tolist()
+        self.spatial_coords = spatial_coords
         if regular_nn:
-            self.phi_columns = ['mid_x_y', 'mid_y_y', 'mid_z_y']
+            self.phi_columns = spatial_coords
         if self.covariates is not None:
             self.p = len(self.covariates) + len(self.phi_columns)
         else:
@@ -126,9 +127,9 @@ class DeepKrigingTrainer:
             if test_data is not None:
                 self.x_test = torch.tensor(test_data[self.phi_columns].values, dtype=torch.float32)
 
-        self.y_train = torch.tensor(train_data[response_var].values.reshape(-1, 1), dtype=torch.float32)
+        self.y_train = torch.tensor(train_data[mineral].values.reshape(-1, 1), dtype=torch.float32)
         if test_data is not None:
-            self.y_test = torch.tensor(test_data[response_var].values.reshape(-1, 1), dtype=torch.float32)
+            self.y_test = torch.tensor(test_data[mineral].values.reshape(-1, 1), dtype=torch.float32)
 
         self.model2 = DeepKriging(self.p)
         criterion = nn.MSELoss()
@@ -181,8 +182,8 @@ class DeepKrigingTrainer:
                     self.x_train = torch.tensor(self.train_data[self.phi_columns].values, dtype=torch.float32)
                     self.x_test = torch.tensor(self.test_data[self.phi_columns].values, dtype=torch.float32)
 
-                self.y_train = torch.tensor(self.train_data[response_var].values.reshape(-1, 1), dtype=torch.float32)
-                self.y_test = torch.tensor(self.test_data[response_var].values.reshape(-1, 1), dtype=torch.float32)
+                self.y_train = torch.tensor(self.train_data[mineral].values.reshape(-1, 1), dtype=torch.float32)
+                self.y_test = torch.tensor(self.test_data[mineral].values.reshape(-1, 1), dtype=torch.float32)
 
                 self.model2 = DeepKriging(self.p)
                 criterion = nn.MSELoss()
@@ -197,7 +198,7 @@ class DeepKrigingTrainer:
                 self.test_mse_list.append(mean_squared_error(self.y_test, self.test_predictions_fold))
                 self.test_mae_list.append(mean_absolute_error(self.y_test, self.test_predictions_fold))
 
-                y_test_compat = self.test_data[response_var].values
+                y_test_compat = self.test_data[mineral].values
 
                 n = len(y_test_compat)
                 mean_y_test = np.mean(y_test_compat)
@@ -228,8 +229,8 @@ class DeepKrigingTrainer:
                 self.x_train = torch.tensor(self.train_data[self.phi_columns].values, dtype=torch.float32)
                 self.x_test = torch.tensor(self.test_data[self.phi_columns].values, dtype=torch.float32)
 
-            self.y_train = torch.tensor(self.train_data[response_var].values.reshape(-1, 1), dtype=torch.float32)
-            self.y_test = torch.tensor(self.test_data[response_var].values.reshape(-1, 1), dtype=torch.float32)
+            self.y_train = torch.tensor(self.train_data[mineral].values.reshape(-1, 1), dtype=torch.float32)
+            self.y_test = torch.tensor(self.test_data[mineral].values.reshape(-1, 1), dtype=torch.float32)
 
             self.x_train_df = pd.DataFrame(self.x_train.numpy(), columns=self.phi_columns + self.covariates if self.covariates else self.phi_columns)
             self.x_test_df = pd.DataFrame(self.x_test.numpy(), columns=self.phi_columns + self.covariates if self.covariates else self.phi_columns)

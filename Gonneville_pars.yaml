@@ -6,8 +6,10 @@ roi_dir: /Users/lin236/Library/CloudStorage/OneDrive-CSIRO/Minerals4D/Projects/G
 
 #Features
 response: Pd_ppm
-covariates: [Pt_ppm, Ni_ppm, Co_ppm, Cr_ppm, Cu_ppm, Lith1_Code]
-cov_labels: ['X (m)', 'Y (m)', 'Z (m)', 'Pt (ppm)', 'Ni (ppm)', 'Co (ppm)', 'Cr (ppm)', 'Lithology 1 code']
+#covariates: [Pt_ppm, Ni_ppm, Co_ppm, Cr_ppm, Cu_ppm, Lith1_Code]
+covariates: [Pt_ppm, Ni_ppm, Co_ppm, Cr_ppm, Cu_ppm]
+#cov_labels: ['X (m)', 'Y (m)', 'Z (m)', 'Pt (ppm)', 'Ni (ppm)', 'Co (ppm)', 'Cr (ppm)', 'Lithology 1 code']
+cov_labels: ['X (m)', 'Y (m)', 'Z (m)', 'Pt (ppm)', 'Ni (ppm)', 'Co (ppm)', 'Cr (ppm)']
 
 #Coordinates
 x: mid_x_y

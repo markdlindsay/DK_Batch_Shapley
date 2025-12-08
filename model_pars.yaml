@@ -1,0 +1,28 @@
+# Gonneville project parameters
+#File locations
+source_dir: [enter the source of your data here with a string and no quotes e.g. /path/to/your/data/]
+working_dir: [enter the working directory here with a string and no quotes e.g. /path/to/your/workingdir/] # this is where outputs will be saved and read from
+roi_dir: [enter the region of interest directory here with a string and no quotes e.g. /path/to/your/roi/] # this is where your ROI shapefiles are stored for selecting data
+
+#Features - specify the response variable and covariates with the appropriate column label 
+response: response_variable_here # no quotes
+covariates: [cov0, cov1, cov2, covN] # no quotes, list all covariates to be used
+cov_labels: ['X (m)', 'Y (m)', 'Z (m)', 'response_variable (ppm)', 'cov0 (ppm)', 'cov2 (ppm)'] # list the labels for all covariates including coordinates WITH quotes for strings
+
+#Coordinates - specify the column labels for the coordinates
+x: x
+y: y
+z: z
+
+#model - specify model architecture and training parameters; defaults listed here
+layers: [200, 100, 100]
+dropout: [0.2, 0.5, 0.5]
+activation: relu
+loss: poisson
+optimizer: adam
+learning_rate: 0.001
+batch_size: 32
+epochs: 100
+cellsize: 400
+
+
